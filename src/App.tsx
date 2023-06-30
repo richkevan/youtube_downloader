@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { downloadVideo, saveVideo } from './firebase-functions';
 import { GoMute, GoUnmute } from "react-icons/go"
-import { popup, signin } from './firebase-auth';
 
 
 function App() {
