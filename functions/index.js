@@ -1,6 +1,10 @@
 const functions = require("firebase-functions");
 const fs = require("fs");
 const ytdl = require("ytdl-core");
+const https = require("https");
+const axios = require("axios");
+const os = require("os");
+const getStorage = require("firebase-admin/storage");
 
 // // Create and deploy your first functions
 // // https://firebase.google.com/docs/functions/get-started
@@ -20,4 +24,15 @@ exports.youtubeDownload = functions.https.onCall(async (data, context) => {
     }),
     url: `https://www.youtube.com/embed/${vid}`,
   };
+});
+
+exports.videoDownload = functions.https.onCall(async (data, context) => {
+  var file = fs.createWriteStream(os.homedir());
+  https.get(data.link, function (res) {
+    res.pipe(file);
+    functions.logger.log(res);
+    file.on("finish", function () {
+      file.close(data.cb);
+    });
+  });
 });
