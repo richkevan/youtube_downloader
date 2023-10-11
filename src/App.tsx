@@ -46,11 +46,15 @@ function App() {
     const form = new FormData(e.currentTarget);
     const data = Object.fromEntries(form.entries());
     console.log(data);
-    const params = new URLSearchParams(data);
-   fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?${params}`)
-    .then((response) => {
-      setVideos((response.data as youtubeResponse).video.filter((video:YoutubeDownload) => video.mimeType.includes("video/mp4")));
-    })
+    const params = new URLSearchParams(JSON.stringify(data));
+    fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?${params}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setVideos(data.video.filter((video: YoutubeDownload) => video.mimeType.includes("video/mp4")));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
