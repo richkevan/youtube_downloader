@@ -46,8 +46,13 @@ function App() {
     const form = new FormData(e.currentTarget);
     const data = Object.fromEntries(form.entries());
     console.log(data);
-    const params = new URLSearchParams(JSON.stringify(data));
-    fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?${params}`)
+    const params = new URLSearchParams(data.url.toString());
+    fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?url=${params}`,
+    {
+      headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }})
       .then((response) => response.json())
       .then((data) => {
         setVideos(data.video.filter((video: YoutubeDownload) => video.mimeType.includes("video/mp4")));
