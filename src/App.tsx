@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { youtubeDownload } from './_firebase/firebase-functions';
 
 
 export interface YoutubeDownload {
@@ -47,7 +46,8 @@ function App() {
     const form = new FormData(e.currentTarget);
     const data = Object.fromEntries(form.entries());
     console.log(data);
-    youtubeDownload({url:data.url})
+    const params = new URLSearchParams(data);
+   fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?${params}`)
     .then((response) => {
       setVideos((response.data as youtubeResponse).video.filter((video:YoutubeDownload) => video.mimeType.includes("video/mp4")));
     })
