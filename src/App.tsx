@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
 export interface YoutubeDownload {
@@ -50,12 +50,22 @@ function App() {
     fetch(`https://youtubedownload-mr2xxcosrq-uc.a.run.app?url=${params}`)
       .then((response) => response.json())
       .then((data) => {
-        setVideos(data.video.filter((video: YoutubeDownload) => video.mimeType.includes("video/mp4")));
+        setVideos(data.video.filter((video:YoutubeDownload) => 
+        video.hasVideo === true &&
+        video.hasAudio === true &&
+        video.height > 360 &&
+        video.quality !== 'large' &&
+        video.mimeType.includes('video/mp4')
+        ));
       })
       .catch((error) => {
         console.error(error);
       });
   };
+
+  useEffect(() => {
+    console.log(videos);
+  }, [videos]);
 
   return (
     <div className='flex flex-col gap-8 mt-16'>
@@ -77,12 +87,13 @@ function App() {
     {videos && videos.length > 0 && 
     <>
     <div className='w-2/ mx-auto'>To download a video right click on the video and click save as.</div>
-    <div className='flex justify-center w-3/4 mx-auto gap-4'>
+    <div className='flex justify-center w-3/4 mx-auto gap-4 flex-wrap'>
         
         {videos.map((video) => (
-          <ul>
-            <li>Quality: {video.qualityLabel}</li>
-            <li>Size: {video.quality}</li>
+          <ul className='w-1/5'>
+            <li><strong>Quality:</strong> {video.qualityLabel}</li>
+            <li><strong>Size:</strong>{video.quality}</li>
+            <li><strong>Audio:</strong> {video.hasAudio.toString()}</li>
             <li><video 
             src={video.url} 
             className='w-64 h-36 aspect-video'></video></li>

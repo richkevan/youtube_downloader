@@ -10,7 +10,7 @@ const express = require("express");
 const app = express();
 
 const corsOptions = {
-  origin:'*',
+  origin:'https://richkevan.github.io',
   methods: ['GET','OPTIONS'],
   allowedHeaders: ['Content-Type'],
 };
