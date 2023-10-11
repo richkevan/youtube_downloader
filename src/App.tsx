@@ -1,20 +1,55 @@
 import { useState } from 'react';
-import { youtubeDownload, videoDownload } from './_firebase/firebase-functions';
+import { youtubeDownload } from './_firebase/firebase-functions';
+
+
+export interface YoutubeDownload {
+  mimeType: string
+  qualityLabel: string
+  bitrate: number
+  audioBitrate: number
+  itag: number
+  url: string
+  width: number
+  height: number
+  lastModified: string
+  contentLength: string
+  quality: string
+  fps: number
+  projectionType: string
+  averageBitrate: number
+  audioQuality: string
+  approxDurationMs: string
+  audioSampleRate: string
+  audioChannels: number
+  hasVideo: boolean
+  hasAudio: boolean
+  container: string
+  codecs: string
+  videoCodec: string
+  audioCodec: string
+  isLive: boolean
+  isHLS: boolean
+  isDashMPD: boolean
+}
+
+export interface youtubeResponse {
+  video: YoutubeDownload[]
+  url: string
+}
 
 function App() {
-  const [loading, setLoading] = useState(true);
-  const [videos, setVideos] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState<YoutubeDownload[]>([]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    const form = new FormData(e.target);
+    // setLoading(true);
+    const form = new FormData(e.currentTarget);
     const data = Object.fromEntries(form.entries());
     console.log(data);
     youtubeDownload({url:data.url})
     .then((response) => {
-      console.log(response.data);
-      setVideos(response.data.video.filter((video) => video.mimeType.includes("video/mp4")));
+      setVideos((response.data as youtubeResponse).video.filter((video:YoutubeDownload) => video.mimeType.includes("video/mp4")));
     })
   };
 
