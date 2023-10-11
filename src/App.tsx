@@ -1,77 +1,59 @@
-import { HttpsCallableResult } from 'firebase/functions';
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import { downloadVideo, saveVideo } from './firebase-functions';
-import { GoMute, GoUnmute } from "react-icons/go"
-
+import { useState } from 'react';
+import { youtubeDownload, videoDownload } from './_firebase/firebase-functions';
 
 function App() {
-  const [url, setUrl] = useState("")
-  const [formats, setFormats] = useState([])
-  const [displayFormats, setDisplayFormats] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [videos, setVideos] = useState([]);
 
-  const submitVideo = (e: React.SyntheticEvent) => {
-    e.preventDefault()
-    console.log(url)
-    downloadVideo({ url })
-      .then((res: HttpsCallableResult<any>) => {
-        setFormats(res.data.video)
-        setDisplayFormats(res.data.video.filter((video: {height: number, mimeType: string}) => ( video.mimeType.includes("video") && video.height >= 720 )))
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form.entries());
+    console.log(data);
+    youtubeDownload({url:data.url})
+    .then((response) => {
+      console.log(response.data);
+      setVideos(response.data.video.filter((video) => video.mimeType.includes("video/mp4")));
     })
-  }
+  };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Mytube</h1>
-        <h5>Turn YouTube Videos into your videos</h5>
-        
-        <div>
-        
-        
-        </div>
-        <form onSubmit={submitVideo}>
-          <input type="url" placeholder='Youtube Url' value={url} onChange={(e) => { setUrl(e.target.value) }} style={{width: "25vw", padding: ".5rem .75rem", lineHeight: "2rem", fontSize: "1.15rem", fontWeight: "bold"}} />
-          <button type="submit"><b>Preview</b></button>
-        </form>
-        {formats.length > 0 && 
-          <div style={{width: "100%"}}>
-            To download video right click and select <u>Save Video As</u>
-            <div className='card-container'>
-            {displayFormats.map((format: {
-            quality: string,
-            fps: number,
-            hasAudio: boolean,
-            url: string,
-            itag: number,
-            height: number,
-            width: number,
-            mimeType: string,
-            container: string
-          }) => (
-            <div
-                key={`${format.itag}`}
-                id={`${format.itag}`}
-              className="download-card"
-            >
-              <div className='video-container'><video src={format.url} /></div>
-              <div className='video-info'>
-              <span>Video Size: {format.width}x{format.height}</span>
-              <span>FPS: {format.fps}</span>
-                <span>Audio: {format.hasAudio ? <GoUnmute /> : <GoMute />}</span>
-                <span>Format: {format.container}</span>
-              </div>
-              
-                  
-            </div>
-          ))}
-          </div>
-          
-          </div>
-        }
-      </header>
+    <div className='flex flex-col gap-8 mt-16'>
+    <div className='grid justify-center text-center gap-8 bg-[url(/assets/youtube.png)] bg-contain bg-no-repeat bg-center h-96 p-4'>
     </div>
-  );
+    <div className='flex justify-center'>
+      <form 
+      className='border-2 border-red-700 rounded-full p-4 font-semibold text-xl w-2/5 flex'
+      onSubmit={(e) => handleSubmit(e)}>
+        <input 
+        type="text" 
+        placeholder="Search" 
+        className='flex-1'
+        name='url'/> 
+      <span className='border-2 border-red-700 w-1 mx-2'></span>
+        <button type="submit"><div className='bg-[url(/youtube.png)] w-6 h-7 bg-center bg-no-repeat bg-[length:130px_130px]'></div></button>
+      </form>
+    </div>
+    {videos && videos.length > 0 && 
+    <>
+    <div className='w-2/ mx-auto'>To download a video right click on the video and click save as.</div>
+    <div className='flex justify-center w-3/4 mx-auto gap-4'>
+        
+        {videos.map((video) => (
+          <ul>
+            <li>Quality: {video.qualityLabel}</li>
+            <li>Size: {video.quality}</li>
+            <li><video 
+            src={video.url} 
+            className='w-64 h-36 aspect-video'></video></li>
+          </ul>
+        ))}
+      </div>
+    </>
+    }
+    </div>
+  )
 }
 
-export default App;
+export default App

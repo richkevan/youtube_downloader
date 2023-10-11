@@ -10,10 +10,5 @@
         "firebase-debug.*.log"
       ]
     }
-  ],
-  "hosting": {
-    "site": "yourtube-projects",
-    "public": "build",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
-  }
+  ]
 }
