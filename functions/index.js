@@ -10,18 +10,22 @@ const express = require("express");
 const app = express();
 
 const corsOptions = {
-  origin:'https://richkevan.github.io/youtube_downloader/',
-  methods: ['GET'],
+  origin:'*',
+  methods: ['GET','OPTIONS'],
   allowedHeaders: ['Content-Type'],
 };
 
 app.use(cors(corsOptions));
 
-const videoConvert = app.get("/", async (req, res) => {
+const videoConvert = app.get("/", async (request, response) => {
   logger.debug(request.query);
   const vid = request.query.url.split("v=")[1];
   const video = await ytdl.getInfo(vid);
   logger.debug(video);
+  response.header({
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  })
   response.status(200).send({
     video: video.formats.sort((a, b) => {
       return a.mimetype < b.mimetype;
